@@ -6,8 +6,7 @@ public class ArtOrganization
     public string Name { get; set; }
     public string Description { get; set; }
     public string Email { get; set; }
-
-    // Address
-
+    public string Location { get; set; }
     public virtual ICollection<User>? Users { get; set; }
+    public virtual ICollection<ArtEvent>? Events { get; set; }
 }
