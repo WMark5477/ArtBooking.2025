@@ -1,5 +1,6 @@
 using Business.Model.Data;
 using Microsoft.EntityFrameworkCore;
+using Business.Application.Services.Organizations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ArtBookingDbContext>(o => o.UseInMemoryDatabase("ArtBooking"));
+
+// Register application services
+builder.Services.AddScoped<IArtOrganizationService, ArtOrganizationService>();
 
 var app = builder.Build();
 

@@ -2,16 +2,19 @@ using Business.Model.Data;
 using Business.Model.Entities.Organizations;
 using Xtech.Common.Pagination;
 using Microsoft.AspNetCore.Mvc;
+using Business.Application.Services.Organizations;
 
 [ApiController]
 [Route("api/[controller]")]
 public class ArtOrganizationController : ControllerBase
 {
     private readonly ArtBookingDbContext _dbContext;
+    private readonly IArtOrganizationService _artOrganizationService;
 
-    public ArtOrganizationController(ArtBookingDbContext dbContext)
+    public ArtOrganizationController(ArtBookingDbContext dbContext, IArtOrganizationService artOrganizationService)
     {
         _dbContext = dbContext;
+        _artOrganizationService = artOrganizationService;
     }
 
     [HttpPost]
@@ -19,8 +22,8 @@ public class ArtOrganizationController : ControllerBase
     {
         try
         {
-            _dbContext.Add(organization);
-            _dbContext.SaveChanges();
+            var createdOrganization = _artOrganizationService.CreateOrganization(organization);
+            return CreatedAtAction(nameof(CreateOrganization), new { createdOrganization.ArtOrganizationId }, createdOrganization);
         }
         catch (Exception exp)
         {
@@ -31,8 +34,6 @@ public class ArtOrganizationController : ControllerBase
                 detail: exp.Message
             );
         }
-
-        return CreatedAtAction(nameof(CreateOrganization), new { organization.ArtOrganizationId }, organization);
     }
 
     [HttpGet]
