@@ -1,6 +1,6 @@
 using Business.Model.Entities.Organizations;
 
-namespace Business.Application.DTOs.ArtOrganizationFilters
+namespace Business.Application.DTOs.Organizations
 {
     /// <summary>
     /// Filter parameters for art organization listings

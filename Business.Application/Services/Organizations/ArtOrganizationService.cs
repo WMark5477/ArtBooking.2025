@@ -3,7 +3,7 @@ using Business.Model.Entities.Organizations;
 using Xtech.Common.Pagination;
 using System;
 using System.Linq;
-using Business.Application.DTOs.ArtOrganizationFilters;
+using Business.Application.DTOs.Organizations;
 
 namespace Business.Application.Services.Organizations
 {
@@ -14,6 +14,11 @@ namespace Business.Application.Services.Organizations
     {
         private readonly ArtBookingDbContext _dbContext;
 
+        /// <summary>
+        /// Static user ID for mocking the current user
+        /// </summary>
+        private static readonly int UserId = 1;
+
         public ArtOrganizationService(ArtBookingDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -22,22 +27,30 @@ namespace Business.Application.Services.Organizations
         /// <summary>
         /// Creates a new art organization
         /// </summary>
-        /// <param name="organization">The organization to create</param>
-        /// <returns>The created organization with ID</returns>
+        /// <param name="organizationDto">The organization DTO with data for creation</param>
+        /// <returns>The created organization DTO with ID</returns>
         /// <exception cref="Exception">Thrown when an error occurs during organization creation</exception>
-        public ArtOrganization CreateOrganization(ArtOrganization organization)
+        public ArtOrganizationDto CreateOrganization(CreateArtOrganizationDto organizationDto)
         {
+            var organization = organizationDto.ToEntity();
+
+            // Set creation and update properties
+            organization.CreatedAt = DateTime.Now;
+            organization.CreatedById = UserId;
+            organization.UpdatedAt = DateTime.Now;
+            organization.UpdatedById = UserId;
+
             _dbContext.Add(organization);
             _dbContext.SaveChanges();
-            return organization;
+            return organization.ToDto();
         }
 
         /// <summary>
         /// List organizations with pagination, filtering, and sorting
         /// </summary>
         /// <param name="listParams">List parameters including pagination, filters, and sorting</param>
-        /// <returns>A paged list of art organizations</returns>
-        public PagedList<ArtOrganization> ListOrganizations(PagedListParams<ArtOrganizationFilters> listParams)
+        /// <returns>A paged list of art organization DTOs</returns>
+        public PagedList<ArtOrganizationDto> ListOrganizations(PagedListParams<ArtOrganizationFilters> listParams)
         {
             var query = _dbContext.ArtOrganizations.AsQueryable();
 
@@ -84,7 +97,19 @@ namespace Business.Application.Services.Organizations
                 query = query.OrderBy(o => o.Name);
             }
 
-            return query.AsPagedList(listParams.PageNumber, listParams.PageSize);
+            // First get the paged entities
+            var pagedEntities = query.AsPagedList(listParams.PageNumber, listParams.PageSize);
+
+            // Then convert to DTOs
+            var dtoItems = pagedEntities.Items.Select(entity => entity.ToDto()).ToList();
+
+            // Create a new paged list with the DTOs
+            return new PagedList<ArtOrganizationDto>(
+                dtoItems,
+                pagedEntities.TotalCount,
+                pagedEntities.PageNumber,
+                pagedEntities.PageSize
+            );
         }
     }
 }
