@@ -3,6 +3,9 @@ using Business.Model.Entities.Organizations;
 using Xtech.Common.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Business.Application.Services.Organizations;
+using System;
+using System.Linq;
+using Business.Application.DTOs.ArtOrganizationFilters;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -71,52 +74,7 @@ public class ArtOrganizationController : ControllerBase
     {
         try
         {
-            var query = _dbContext.ArtOrganizations.AsQueryable();
-
-            // Apply filters if provided
-            if (listParams.Filters != null)
-            {
-                // Filter by name (case-insensitive partial match)
-                if (!string.IsNullOrEmpty(listParams.Filters.Name))
-                {
-                    query = query.Where(o => o.Name.ToLower().Contains(listParams.Filters.Name.ToLower()));
-                }
-
-                // Filter by kind
-                if (listParams.Filters.Kind.HasValue)
-                {
-                    query = query.Where(o => o.Kind == listParams.Filters.Kind.Value);
-                }
-            }
-
-            // Apply sorting
-            if (listParams.HasSort())
-            {
-                if (listParams.SortByFieldIs("OrganizationName"))
-                {
-                    query = listParams.IsSortByAsc()
-                        ? query.OrderBy(o => o.Name)
-                        : query.OrderByDescending(o => o.Name);
-                }
-                else if (listParams.SortByFieldIs("CreatedAt"))
-                {
-                    query = listParams.IsSortByAsc()
-                        ? query.OrderBy(o => o.CreatedAt)
-                        : query.OrderByDescending(o => o.CreatedAt);
-                }
-                // Default sorting by Name ascending if sort field is not recognized
-                else
-                {
-                    query = query.OrderBy(o => o.Name);
-                }
-            }
-            else
-            {
-                // Default sorting by Name if no sort specified
-                query = query.OrderBy(o => o.Name);
-            }
-
-            var result = query.AsPagedList(listParams.PageNumber, listParams.PageSize);
+            var result = _artOrganizationService.ListOrganizations(listParams);
             return Ok(result);
         }
         catch (Exception exp)
@@ -178,21 +136,5 @@ public class ArtOrganizationController : ControllerBase
                 detail: exp.Message
             );
         }
-    }
-
-    /// <summary>
-    /// Filter parameters for art organization listings
-    /// </summary>
-    public class ArtOrganizationFilters
-    {
-        /// <summary>
-        /// Filter by organization name (partial match)
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Filter by organization kind
-        /// </summary>
-        public OrganizationKind? Kind { get; set; }
     }
 }
