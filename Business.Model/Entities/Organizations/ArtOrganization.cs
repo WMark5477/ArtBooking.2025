@@ -92,7 +92,7 @@ namespace Business.Model.Entities.Organizations
         /// Navigation property for events associated with this organization
         /// </summary>
         [JsonIgnore]
-        public virtual ICollection<ArtEvent>? Events { get; set; }
+        public virtual List<ArtEvent>? Events { get; set; }
 
         /// <summary>
         /// Navigation property for users who are members of this organization

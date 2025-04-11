@@ -1,6 +1,7 @@
 using Business.Model.Data;
 using Microsoft.EntityFrameworkCore;
 using Business.Application.Services.Organizations;
+using Storage.Mockup.DbSeed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,9 @@ builder.Services.AddDbContext<ArtBookingDbContext>(o => o.UseInMemoryDatabase("A
 builder.Services.AddScoped<IArtOrganizationService, ArtOrganizationService>();
 
 var app = builder.Build();
+
+// Seed the database
+ArtBookingDbSeeder.SeedNow(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
