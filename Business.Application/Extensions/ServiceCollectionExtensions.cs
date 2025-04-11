@@ -1,4 +1,5 @@
 using Business.Application.Services.Organizations;
+using Business.Application.Services.Events;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -10,6 +11,7 @@ namespace Business.Application.Extensions
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddScoped<IArtOrganizationService, ArtOrganizationService>();
+            services.AddScoped<IArtEventService, ArtEventService>();
             return services;
         }
     }
