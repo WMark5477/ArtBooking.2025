@@ -14,10 +14,8 @@ public class ArtBookingDbSeeder
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ArtBookingDbContext>();
 
-        // Apply any pending migrations
-        // context.Database.Migrate();
-
         // Check if data already exists to avoid duplicates
+        // For in memory database not necessary by for true database scenario is better to check.
         if (!context.ArtOrganizations.Any())
         {
             var orgBagatela = new ArtOrganization
@@ -34,6 +32,10 @@ public class ArtBookingDbSeeder
                 PostalCode = "31-128",
                 Country = "Polska",
                 LogoUrl = "https://bagatela.pl/wp-content/themes/bagatela/images/logo.svg",
+                CreatedAt = new DateTime(2024, 1, 1, 10, 0, 0),
+                CreatedById = 1,
+                UpdatedAt = new DateTime(2024, 1, 1, 10, 0, 0),
+                UpdatedById = 1
             };
 
             var orgMultikino = new ArtOrganization
@@ -49,7 +51,11 @@ public class ArtBookingDbSeeder
                 Town = "Kraków",
                 PostalCode = "31-416",
                 Country = "Polska",
-                LogoUrl = "https://multikino.pl/-/jssmedia/multikino/img/logo-multikino.svg"
+                LogoUrl = "https://multikino.pl/-/jssmedia/multikino/img/logo-multikino.svg",
+                CreatedAt = new DateTime(2024, 1, 2, 11, 0, 0),
+                CreatedById = 1,
+                UpdatedAt = new DateTime(2024, 1, 2, 11, 0, 0),
+                UpdatedById = 1
             };
 
             var orgMuzeumNarodowe = new ArtOrganization
@@ -65,7 +71,11 @@ public class ArtBookingDbSeeder
                 Town = "Kraków",
                 PostalCode = "30-062",
                 Country = "Polska",
-                LogoUrl = "https://logowik.com/content/uploads/images/muzeum-narodowe-w-krakowie-new2995.logowik.com.webp"
+                LogoUrl = "https://logowik.com/content/uploads/images/muzeum-narodowe-w-krakowie-new2995.logowik.com.webp",
+                CreatedAt = new DateTime(2024, 1, 3, 12, 0, 0),
+                CreatedById = 1,
+                UpdatedAt = new DateTime(2024, 1, 3, 12, 0, 0),
+                UpdatedById = 1
             };
 
             var orgMuzeumPowstania = new ArtOrganization
@@ -81,7 +91,11 @@ public class ArtBookingDbSeeder
                 Town = "Warszawa",
                 PostalCode = "00-844",
                 Country = "Polska",
-                LogoUrl = "https://www.1944.pl/img/logo-color.svg"
+                LogoUrl = "https://www.1944.pl/img/logo-color.svg",
+                CreatedAt = new DateTime(2024, 1, 4, 13, 0, 0),
+                CreatedById = 1,
+                UpdatedAt = new DateTime(2024, 1, 4, 13, 0, 0),
+                UpdatedById = 1
             };
 
             context.ArtOrganizations.AddRange(
@@ -100,7 +114,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 1,
                     Status = EventStatus.TicketSalesOpen,
                     Category = EventCategory.Theater,
-                    ImageUrl = "https://bagatela.pl/wp-content/uploads/2023/11/szalone-nozyczki.jpg"
+                    ImageUrl = "https://bagatela.pl/wp-content/uploads/2023/11/szalone-nozyczki.jpg",
+                    CreatedAt = new DateTime(2024, 1, 5, 14, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 5, 14, 0, 0),
+                    UpdatedById = 1
                 },
                 new ArtEvent
                 {
@@ -109,7 +127,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 1,
                     Status = EventStatus.TicketSalesOpen,
                     Category = EventCategory.Theater,
-                    ImageUrl = "https://bagatela.pl/wp-content/uploads/2023/11/pijacy.jpg"
+                    ImageUrl = "https://bagatela.pl/wp-content/uploads/2023/11/pijacy.jpg",
+                    CreatedAt = new DateTime(2024, 1, 6, 15, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 6, 15, 0, 0),
+                    UpdatedById = 1
                 },
                 new ArtEvent
                 {
@@ -118,7 +140,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 1,
                     Status = EventStatus.Published,
                     Category = EventCategory.Theater,
-                    ImageUrl = "https://bagatela.pl/wp-content/uploads/2023/11/bajki-dla-niegrzecznych.jpg"
+                    ImageUrl = "https://bagatela.pl/wp-content/uploads/2023/11/bajki-dla-niegrzecznych.jpg",
+                    CreatedAt = new DateTime(2024, 1, 7, 16, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 7, 16, 0, 0),
+                    UpdatedById = 1
                 }
             };
 
@@ -131,7 +157,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 2,
                     Status = EventStatus.TicketSalesOpen,
                     Category = EventCategory.Film,
-                    ImageUrl = "https://multikino.pl/media/cache/resolve/film_poster/uploads/media/default/0001/02/amator.jpg"
+                    ImageUrl = "https://multikino.pl/media/cache/resolve/film_poster/uploads/media/default/0001/02/amator.jpg",
+                    CreatedAt = new DateTime(2024, 1, 8, 17, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 8, 17, 0, 0),
+                    UpdatedById = 1
                 },
                 new ArtEvent
                 {
@@ -140,7 +170,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 2,
                     Status = EventStatus.TicketSalesOpen,
                     Category = EventCategory.Film,
-                    ImageUrl = "https://multikino.pl/media/cache/resolve/film_poster/uploads/media/default/0001/02/kaiju-no-8.jpg"
+                    ImageUrl = "https://multikino.pl/media/cache/resolve/film_poster/uploads/media/default/0001/02/kaiju-no-8.jpg",
+                    CreatedAt = new DateTime(2024, 1, 9, 18, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 9, 18, 0, 0),
+                    UpdatedById = 1
                 },
                 new ArtEvent
                 {
@@ -149,7 +183,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 2,
                     Status = EventStatus.Published,
                     Category = EventCategory.Film,
-                    ImageUrl = "https://multikino.pl/media/cache/resolve/film_poster/uploads/media/default/0001/02/surfer.jpg"
+                    ImageUrl = "https://multikino.pl/media/cache/resolve/film_poster/uploads/media/default/0001/02/surfer.jpg",
+                    CreatedAt = new DateTime(2024, 1, 10, 19, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 10, 19, 0, 0),
+                    UpdatedById = 1
                 }
             };
 
@@ -162,7 +200,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 3,
                     Status = EventStatus.Published,
                     Category = EventCategory.Exhibition,
-                    ImageUrl = "https://mnk.pl/media/cache/resolve/cover/uploads/media/default/0001/02/boznanska.jpg"
+                    ImageUrl = "https://mnk.pl/media/cache/resolve/cover/uploads/media/default/0001/02/boznanska.jpg",
+                    CreatedAt = new DateTime(2024, 1, 11, 20, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 11, 20, 0, 0),
+                    UpdatedById = 1
                 },
                 new ArtEvent
                 {
@@ -171,7 +213,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 3,
                     Status = EventStatus.Published,
                     Category = EventCategory.Exhibition,
-                    ImageUrl = "https://mnk.pl/media/cache/resolve/cover/uploads/media/default/0001/02/lysogorski-zwierzyniec.jpg"
+                    ImageUrl = "https://mnk.pl/media/cache/resolve/cover/uploads/media/default/0001/02/lysogorski-zwierzyniec.jpg",
+                    CreatedAt = new DateTime(2024, 1, 12, 21, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 12, 21, 0, 0),
+                    UpdatedById = 1
                 },
                 new ArtEvent
                 {
@@ -180,7 +226,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 3,
                     Status = EventStatus.Published,
                     Category = EventCategory.Exhibition,
-                    ImageUrl = "https://mnk.pl/media/cache/resolve/cover/uploads/media/default/0001/02/krolestwo-roslin-i-zwierzat.jpg"
+                    ImageUrl = "https://mnk.pl/media/cache/resolve/cover/uploads/media/default/0001/02/krolestwo-roslin-i-zwierzat.jpg",
+                    CreatedAt = new DateTime(2024, 1, 13, 22, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 13, 22, 0, 0),
+                    UpdatedById = 1
                 }
             };
 
@@ -193,7 +243,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 4,
                     Status = EventStatus.Published,
                     Category = EventCategory.Exhibition,
-                    ImageUrl = "https://www.1944.pl/media/cache/resolve/cover/uploads/media/default/0001/02/rzeczywiste.jpg"
+                    ImageUrl = "https://www.1944.pl/media/cache/resolve/cover/uploads/media/default/0001/02/rzeczywiste.jpg",
+                    CreatedAt = new DateTime(2024, 1, 14, 23, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 14, 23, 0, 0),
+                    UpdatedById = 1
                 },
                 new ArtEvent
                 {
@@ -202,7 +256,11 @@ public class ArtBookingDbSeeder
                     ArtOrganizationId = 4,
                     Status = EventStatus.Published,
                     Category = EventCategory.Exhibition,
-                    ImageUrl = "https://www.1944.pl/media/cache/resolve/cover/uploads/media/default/0001/02/wystawa-stala.jpg"
+                    ImageUrl = "https://www.1944.pl/media/cache/resolve/cover/uploads/media/default/0001/02/wystawa-stala.jpg",
+                    CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0),
+                    CreatedById = 1,
+                    UpdatedAt = new DateTime(2024, 1, 15, 0, 0, 0),
+                    UpdatedById = 1
                 }
             };
 
