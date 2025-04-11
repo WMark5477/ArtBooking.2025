@@ -1,6 +1,6 @@
 using Business.Model.Data;
 using Microsoft.EntityFrameworkCore;
-using Business.Application.Services.Organizations;
+using Business.Application.Extensions;
 using Storage.Mockup.DbSeed;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ArtBookingDbContext>(o => o.UseInMemoryDatabase("ArtBooking"));
 
 // Register application services
-builder.Services.AddScoped<IArtOrganizationService, ArtOrganizationService>();
+builder.Services.AddArtBookingBusinessLayer();
 
 var app = builder.Build();
 

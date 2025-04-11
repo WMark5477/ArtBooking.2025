@@ -4,6 +4,8 @@ using Xtech.Common.Pagination;
 using System;
 using System.Linq;
 using Business.Application.DTOs.Organizations;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business.Application.Services.Organizations
 {
@@ -13,15 +15,17 @@ namespace Business.Application.Services.Organizations
     public class ArtOrganizationService : IArtOrganizationService
     {
         private readonly ArtBookingDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Static user ID for mocking the current user
         /// </summary>
         private static readonly int UserId = 1;
 
-        public ArtOrganizationService(ArtBookingDbContext dbContext)
+        public ArtOrganizationService(ArtBookingDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -32,7 +36,7 @@ namespace Business.Application.Services.Organizations
         /// <exception cref="Exception">Thrown when an error occurs during organization creation</exception>
         public ArtOrganizationDto CreateOrganization(CreateArtOrganizationDto organizationDto)
         {
-            var organization = organizationDto.ToEntity();
+            var organization = _mapper.Map<ArtOrganization>(organizationDto);
 
             // Set creation and update properties
             organization.CreatedAt = DateTime.Now;
@@ -42,7 +46,43 @@ namespace Business.Application.Services.Organizations
 
             _dbContext.Add(organization);
             _dbContext.SaveChanges();
-            return organization.ToDto();
+            return _mapper.Map<ArtOrganizationDto>(organization);
+        }
+
+        /// <summary>
+        /// Gets an art organization by its ID
+        /// </summary>
+        /// <param name="id">The ID of the organization to retrieve</param>
+        /// <returns>The organization DTO if found, null otherwise</returns>
+        public ArtOrganizationDto? GetOrganization(int id)
+        {
+            var organization = _dbContext.ArtOrganizations.Find(id);
+            return organization != null ? _mapper.Map<ArtOrganizationDto>(organization) : null;
+        }
+
+        /// <summary>
+        /// Updates an existing art organization
+        /// </summary>
+        /// <param name="id">The ID of the organization to update</param>
+        /// <param name="organizationDto">The updated organization data</param>
+        /// <returns>The updated organization DTO if successful, null if organization not found</returns>
+        public ArtOrganizationDto? EditOrganization(int id, CreateArtOrganizationDto organizationDto)
+        {
+            var existingOrganization = _dbContext.ArtOrganizations.Find(id);
+            if (existingOrganization == null)
+            {
+                return null;
+            }
+
+            // Update properties using AutoMapper
+            _mapper.Map(organizationDto, existingOrganization);
+
+            // Update audit fields
+            existingOrganization.UpdatedAt = DateTime.UtcNow;
+            existingOrganization.UpdatedById = UserId;
+
+            _dbContext.SaveChanges();
+            return _mapper.Map<ArtOrganizationDto>(existingOrganization);
         }
 
         /// <summary>
@@ -100,8 +140,8 @@ namespace Business.Application.Services.Organizations
             // First get the paged entities
             var pagedEntities = query.AsPagedList(listParams.PageNumber, listParams.PageSize);
 
-            // Then convert to DTOs
-            var dtoItems = pagedEntities.Items.Select(entity => entity.ToDto()).ToList();
+            // Then convert to DTOs using AutoMapper
+            var dtoItems = _mapper.Map<List<ArtOrganizationDto>>(pagedEntities.Items);
 
             // Create a new paged list with the DTOs
             return new PagedList<ArtOrganizationDto>(

@@ -4,19 +4,16 @@ using Xtech.Common.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Business.Application.Services.Organizations;
 using System;
-using System.Linq;
 using Business.Application.DTOs.Organizations;
 
 [ApiController]
 [Route("api/[controller]")]
 public class ArtOrganizationController : ControllerBase
 {
-    private readonly ArtBookingDbContext _dbContext;
     private readonly IArtOrganizationService _artOrganizationService;
 
-    public ArtOrganizationController(ArtBookingDbContext dbContext, IArtOrganizationService artOrganizationService)
+    public ArtOrganizationController(IArtOrganizationService artOrganizationService)
     {
-        _dbContext = dbContext;
         _artOrganizationService = artOrganizationService;
     }
 
@@ -32,8 +29,7 @@ public class ArtOrganizationController : ControllerBase
         {
             return Problem(
                 statusCode: 500,
-                title: "An unexpected error occured",
-                // just for debugging purposes
+                title: "An unexpected error occurred",
                 detail: exp.Message
             );
         }
@@ -44,22 +40,24 @@ public class ArtOrganizationController : ControllerBase
     {
         try
         {
-            var organization = _dbContext.ArtOrganizations.Find(id);
+            var organization = _artOrganizationService.GetOrganization(id);
 
-            if (organization == null) return Problem(
-                statusCode: 404,
-                title: "Organization cannot be found",
-                detail: $"Organization with id:{id} cannot be found!"
-            );
+            if (organization == null)
+            {
+                return Problem(
+                    statusCode: 404,
+                    title: "Organization cannot be found",
+                    detail: $"Organization with id:{id} cannot be found!"
+                );
+            }
 
-            return Ok(organization.ToDto());
+            return Ok(organization);
         }
         catch (Exception exp)
         {
             return Problem(
                 statusCode: 500,
-                title: "An unexpected error occured",
-                // just for debugging purposes
+                title: "An unexpected error occurred",
                 detail: exp.Message
             );
         }
@@ -99,31 +97,18 @@ public class ArtOrganizationController : ControllerBase
     {
         try
         {
-            var existingOrganization = _dbContext.ArtOrganizations.Find(id);
-            if (existingOrganization == null)
+            var updatedOrganization = _artOrganizationService.EditOrganization(id, organizationDto);
+
+            if (updatedOrganization == null)
             {
-                return NotFound($"Organization with id:{id} cannot be found!");
+                return Problem(
+                    statusCode: 404,
+                    title: "Organization cannot be found",
+                    detail: $"Organization with id:{id} cannot be found!"
+                );
             }
 
-            // Update only scalar properties, preserving relationships
-            existingOrganization.Name = organizationDto.Name;
-            existingOrganization.Description = organizationDto.Description;
-            existingOrganization.Kind = organizationDto.Kind;
-            existingOrganization.Email = organizationDto.Email;
-            existingOrganization.PhoneNumber = organizationDto.PhoneNumber;
-            existingOrganization.Website = organizationDto.Website;
-            existingOrganization.Street = organizationDto.Street;
-            existingOrganization.AddressNumber = organizationDto.AddressNumber;
-            existingOrganization.Town = organizationDto.Town;
-            existingOrganization.PostalCode = organizationDto.PostalCode;
-            existingOrganization.Country = organizationDto.Country;
-            existingOrganization.LogoUrl = organizationDto.LogoUrl;
-            existingOrganization.UpdatedAt = DateTime.UtcNow;
-            // Do NOT update navigation properties (Events, Users)
-
-            _dbContext.SaveChanges();
-
-            return Ok(existingOrganization.ToDto());
+            return Ok(updatedOrganization);
         }
         catch (Exception exp)
         {
