@@ -4,6 +4,7 @@ using Business.Model.Entities.Organizations;
 using Business.Model.Entities.Events;
 using Business.Model.Entities.Events.Enums;
 using System.Collections.Generic;
+using Business.Model.Entities.Venues;
 
 namespace Storage.Mockup.DbSeed;
 
@@ -263,6 +264,78 @@ public class ArtBookingDbSeeder
                     UpdatedById = 1
                 }
             };
+
+            orgBagatela.Venues = new List<Venue>
+            {
+                new Venue
+            {
+                Name = "Bagatela Theatre Main Stage",
+                Description = "Zabytkowy teatr znany z kameralnych spektakli i wyjątkowej atmosfery.",
+                Address = "22 Culture Square",
+                City = "Kraków",
+                State = "",
+                Country = "Poland",
+                PostalCode = "31-123",
+                Website = "https://www.teatrbagatela.pl",
+                Capacity = 500,
+                ImageUrl = "https://example.com/images/bagatela-main-stage.jpg",
+                ArtOrganizationId = 1
+            }
+            };
+            orgMultikino.Venues = new List<Venue>
+            {
+                new Venue
+                {
+                    Name = "Multikino Central",
+                    Description = "Nowoczesne kino z wieloma salami i najnowszymi technologiami projekcji.",
+                    Address = "456 Film Street",
+                    City = "Warsaw",
+                    State = "",
+                    Country = "Poland",
+                    PostalCode = "00-123",
+                    Website = "https://www.multikinocentral.pl",
+                    Capacity = 2000,
+                    ImageUrl = "https://example.com/images/multikino-central.jpg",
+                    ArtOrganizationId = 2
+                }
+            };
+
+            orgMuzeumNarodowe.Venues = new List<Venue>
+            {
+                new Venue
+                {
+                    Name = "National Museum Gallery",
+                    Description = "Główna galeria Narodowego Muzeum z bogatą kolekcją sztuki klasycznej i nowoczesnej.",
+                    Address = "789 Heritage Boulevard",
+                    City = "Warsaw",
+                    State = "",
+                    Country = "Poland",
+                    PostalCode = "00-916",
+                    Website = "https://www.mnw.art.pl",
+                    Capacity = 800,
+                    ImageUrl = "https://example.com/images/national-museum-gallery.jpg",
+                    ArtOrganizationId = 3
+                }
+            };
+
+            orgMuzeumPowstania.Venues = new List<Venue>
+            {
+                new Venue
+                {
+                    Name = "Uprising Museum Hall",
+                    Description = "Historyczna przestrzeń poświęcona upamiętnieniu Powstania Warszawskiego.",
+                    Address = "321 Freedom Road",
+                    City = "Warsaw",
+                    State = "",
+                    Country = "Poland",
+                    PostalCode = "01-123",
+                    Website = "https://www.1944.pl",
+                    Capacity = 600,
+                    ImageUrl = "https://example.com/images/uprising-museum-hall.jpg",
+                    ArtOrganizationId = 4
+                }
+            };
+
 
             context.SaveChanges();
         }

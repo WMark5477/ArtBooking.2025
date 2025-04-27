@@ -2,25 +2,27 @@ using Business.Model.Data;
 using Business.Model.Entities.Venues;
 using Xtech.Common.Pagination;
 using Microsoft.AspNetCore.Mvc;
+using Business.Application.Services.Venues;
+using Business.Application.DTOs.Venues;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("api/[controller]")]
 public class VenueController : ControllerBase
 {
-    private readonly ArtBookingDbContext _dbContext;
-
-    public VenueController(ArtBookingDbContext dbContext)
+    private readonly IVenueService venueService;
+    public VenueController(IVenueService venueService)
     {
-        _dbContext = dbContext;
+        this.venueService = venueService;
     }
 
     [HttpPost]
-    public ActionResult<Venue> CreateVenue(Venue venue)
+    public ActionResult<VenueDto> CreateVenue(CreateVenueDto venueDto, [FromQuery] int? artOrganizationId = null)
     {
         try
         {
-            _dbContext.Add(venue);
-            _dbContext.SaveChanges();
+            var createdVenue = venueService.CreateVenue(venueDto, artOrganizationId);
+            return CreatedAtAction(nameof(GetVenue), new { id = createdVenue.VenueId }, createdVenue);
         }
         catch (Exception exp)
         {
@@ -31,8 +33,6 @@ public class VenueController : ControllerBase
                 detail: exp.Message
             );
         }
-
-        return CreatedAtAction(nameof(CreateVenue), new { venue.VenueId }, venue);
     }
 
     [HttpGet("{id}")]
@@ -40,7 +40,7 @@ public class VenueController : ControllerBase
     {
         try
         {
-            var venue = _dbContext.Venues.Find(id);
+            var venue = venueService.GetVenue(id);
 
             if (venue == null) return Problem(
                 statusCode: 404,
@@ -70,76 +70,7 @@ public class VenueController : ControllerBase
     {
         try
         {
-            var query = _dbContext.Venues.AsQueryable();
-
-            // Apply filters if provided
-            if (listParams.Filters != null)
-            {
-                // Filter by name (case-insensitive partial match)
-                if (!string.IsNullOrEmpty(listParams.Filters.Name))
-                {
-                    query = query.Where(v => v.Name.ToLower().Contains(listParams.Filters.Name.ToLower()));
-                }
-
-                // Filter by city
-                if (!string.IsNullOrEmpty(listParams.Filters.City))
-                {
-                    query = query.Where(v => v.City.ToLower().Contains(listParams.Filters.City.ToLower()));
-                }
-
-                // Filter by capacity
-                if (listParams.Filters.MinCapacity.HasValue)
-                {
-                    query = query.Where(v => v.Capacity >= listParams.Filters.MinCapacity.Value);
-                }
-
-                // Filter by organization
-                if (listParams.Filters.ArtOrganizationId.HasValue)
-                {
-                    query = query.Where(v => v.ArtOrganizationId == listParams.Filters.ArtOrganizationId.Value);
-                }
-            }
-
-            // Apply sorting
-            if (listParams.HasSort())
-            {
-                if (listParams.SortByFieldIs("Name"))
-                {
-                    query = listParams.IsSortByAsc()
-                        ? query.OrderBy(v => v.Name)
-                        : query.OrderByDescending(v => v.Name);
-                }
-                else if (listParams.SortByFieldIs("Capacity"))
-                {
-                    query = listParams.IsSortByAsc()
-                        ? query.OrderBy(v => v.Capacity)
-                        : query.OrderByDescending(v => v.Capacity);
-                }
-                else if (listParams.SortByFieldIs("City"))
-                {
-                    query = listParams.IsSortByAsc()
-                        ? query.OrderBy(v => v.City)
-                        : query.OrderByDescending(v => v.City);
-                }
-                else if (listParams.SortByFieldIs("CreatedAt"))
-                {
-                    query = listParams.IsSortByAsc()
-                        ? query.OrderBy(v => v.CreatedAt)
-                        : query.OrderByDescending(v => v.CreatedAt);
-                }
-                // Default sorting by Name ascending if sort field is not recognized
-                else
-                {
-                    query = query.OrderBy(v => v.Name);
-                }
-            }
-            else
-            {
-                // Default sorting by Name if no sort specified
-                query = query.OrderBy(v => v.Name);
-            }
-
-            var result = query.AsPagedList(listParams.PageNumber, listParams.PageSize);
+            var result = venueService.ListVenues(listParams);
             return Ok(result);
         }
         catch (Exception exp)
@@ -159,47 +90,29 @@ public class VenueController : ControllerBase
     /// <param name="venue">The updated venue data</param>
     /// <returns>The updated venue</returns>
     [HttpPut("{id}")]
-    public ActionResult<Venue> EditVenue(int id, Venue venue)
+    public ActionResult<Venue> EditVenue(int id, VenueDto venueDto)
     {
         try
         {
-            if (id != venue.VenueId)
+            var updatedVenue = venueService.EditVenue(id, venueDto);
+
+            if (updatedVenue == null)
             {
-                return BadRequest("The ID in the URL does not match the ID in the provided data.");
+                return Problem(
+                    statusCode: 404,
+                    title: "Venue cannot be found",
+                    detail: $"Venue with id:{id} cannot be found!"
+                );
             }
 
-            var existingVenue = _dbContext.Venues.Find(id);
-            if (existingVenue == null)
-            {
-                return NotFound($"Venue with id:{id} cannot be found!");
-            }
-
-            // Update only scalar properties, preserving relationships
-            existingVenue.Name = venue.Name;
-            existingVenue.Description = venue.Description;
-            existingVenue.Address = venue.Address;
-            existingVenue.City = venue.City;
-            existingVenue.State = venue.State;
-            existingVenue.Country = venue.Country;
-            existingVenue.PostalCode = venue.PostalCode;
-            existingVenue.Email = venue.Email;
-            existingVenue.PhoneNumber = venue.PhoneNumber;
-            existingVenue.Website = venue.Website;
-            existingVenue.Capacity = venue.Capacity;
-            existingVenue.ImageUrl = venue.ImageUrl;
-            existingVenue.ArtOrganizationId = venue.ArtOrganizationId;
-            // Do NOT update navigation properties (Organization, Areas, PriceLists, ScheduleItems)
-
-            _dbContext.SaveChanges();
-
-            return Ok(existingVenue);
+            return Ok(updatedVenue);
         }
-        catch (Exception exp)
+        catch (ArgumentException exp)
         {
             return Problem(
-                statusCode: 500,
-                title: "An unexpected error occurred",
-                detail: exp.Message
+                statusCode: 409,
+                title: "Venue name must be unique",
+                detail: $"Venue with name: {venueDto.Name} already exists!"
             );
         }
     }
@@ -214,14 +127,14 @@ public class VenueController : ControllerBase
     {
         try
         {
-            var venue = _dbContext.Venues.Find(id);
+            var venue = venueService.GetVenue(id);
             if (venue == null)
             {
                 return NotFound($"Venue with id:{id} cannot be found!");
             }
 
-            _dbContext.Venues.Remove(venue);
-            _dbContext.SaveChanges();
+            venueService.DeleteVenue(id);
+            
 
             return NoContent();
         }
@@ -233,31 +146,5 @@ public class VenueController : ControllerBase
                 detail: exp.Message
             );
         }
-    }
-
-    /// <summary>
-    /// Filter parameters for venue listings
-    /// </summary>
-    public class VenueFilters
-    {
-        /// <summary>
-        /// Filter by venue name (partial match)
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Filter by city (partial match)
-        /// </summary>
-        public string? City { get; set; }
-
-        /// <summary>
-        /// Filter by minimum capacity
-        /// </summary>
-        public int? MinCapacity { get; set; }
-
-        /// <summary>
-        /// Filter by art organization ID
-        /// </summary>
-        public int? ArtOrganizationId { get; set; }
     }
 }
